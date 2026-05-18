@@ -28,6 +28,10 @@
       --red-dim:      rgba(218,51,51,0.12);
       --yellow:       #f0b429;
       --yellow-dim:   rgba(240,180,41,0.12);
+      --blue:         #4a9eff;
+      --blue-dim:     rgba(74,158,255,0.12);
+      --google:       #4285f4;
+      --google-dim:   rgba(66,133,244,0.12);
       --font:         'JetBrains Mono', 'Courier New', monospace;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,19 +41,119 @@
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--card2); border-radius: 3px; }
 
+    /* ── SYNC BAR ── */
+    #sync-bar {
+      display: flex; align-items: center; gap: 7px;
+      padding: 4px 2rem; background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      font-size: 10px; color: var(--text-sub); letter-spacing: 0.04em;
+    }
+    .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-sub); flex-shrink: 0; transition: background 0.3s; }
+    .sync-dot.ok      { background: var(--green); }
+    .sync-dot.syncing { background: var(--yellow); animation: blink 1s infinite; }
+    .sync-dot.err     { background: var(--red); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+    #sync-msg { flex: 1; }
+
     /* ── NAV ── */
     .nav {
       display: flex; align-items: center; justify-content: space-between;
       padding: 0.9rem 2rem; border-bottom: 1px solid var(--border);
       position: sticky; top: 0;
-      background: rgba(26,27,46,0.95); backdrop-filter: blur(8px); z-index: 200;
+      background: rgba(26,27,46,0.96); backdrop-filter: blur(8px); z-index: 200;
     }
     .nav-logo { font-size: 1.1rem; font-weight: 600; color: var(--accent); cursor: pointer; letter-spacing: -0.02em; }
     .nav-logo span { color: var(--text); font-weight: 300; }
-    .nav-links { display: flex; gap: 4px; }
+    .nav-right { display: flex; align-items: center; gap: 4px; }
     .nav-link { padding: 5px 12px; border-radius: 4px; color: var(--text-dim); cursor: pointer; font-size: 11px; letter-spacing: 0.03em; border: 1px solid transparent; transition: all 0.15s; user-select: none; }
     .nav-link:hover { color: var(--text); background: var(--card); }
     .nav-link.active { color: var(--accent); background: var(--accent-light); border-color: var(--accent-glow); }
+    .nav-icon-btn { padding: 5px 9px; border-radius: 4px; color: var(--text-sub); cursor: pointer; font-size: 14px; border: 1px solid transparent; background: transparent; font-family: var(--font); transition: all 0.15s; line-height: 1; }
+    .nav-icon-btn:hover { color: var(--text); background: var(--card); border-color: var(--border); }
+    .nav-icon-btn.connected { color: var(--green); }
+
+    /* ── MODAL BASE ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 500; display: none; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--card); border: 1px solid var(--border2); border-radius: 12px; padding: 1.75rem; width: 100%; max-width: 500px; margin: auto; }
+    .modal-title { font-size: 13px; font-weight: 500; margin-bottom: 0.4rem; display: flex; justify-content: space-between; align-items: center; }
+    .modal-sub  { font-size: 11px; color: var(--text-dim); margin-bottom: 1.5rem; line-height: 1.6; }
+    .modal-close { cursor: pointer; color: var(--text-dim); font-size: 20px; line-height: 1; flex-shrink: 0; }
+    .modal-close:hover { color: var(--text); }
+
+    /* ── GOOGLE SYNC MODAL ── */
+    .gsync-step { margin-bottom: 1.25rem; }
+    .gsync-step-header {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; color: var(--text); font-weight: 500; margin-bottom: 6px;
+    }
+    .gsync-num {
+      background: var(--google-dim); color: var(--google); border: 1px solid rgba(66,133,244,0.3);
+      border-radius: 50%; width: 20px; height: 20px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 600;
+    }
+    .gsync-num.done { background: var(--green-dim); color: var(--green); border-color: rgba(71,207,115,0.3); }
+    .gsync-desc { font-size: 11px; color: var(--text-dim); line-height: 1.7; margin-left: 28px; }
+    .gsync-desc a { color: var(--google); text-decoration: none; }
+    .gsync-desc a:hover { text-decoration: underline; }
+    .gsync-code-block {
+      background: var(--bg); border: 1px solid var(--border2); border-radius: 6px;
+      padding: 10px 12px; font-size: 10px; color: #a8d8a8;
+      white-space: pre; overflow-x: auto; margin: 8px 0 4px 0; line-height: 1.6;
+    }
+    .gsync-copy-btn {
+      font-size: 10px; color: var(--google); cursor: pointer;
+      background: var(--google-dim); border: 1px solid rgba(66,133,244,0.25);
+      border-radius: 4px; padding: 3px 10px; font-family: var(--font);
+      transition: all 0.15s; display: inline-block;
+    }
+    .gsync-copy-btn:hover { background: rgba(66,133,244,0.2); }
+
+    .gsync-divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
+
+    .gsync-field { margin-bottom: 10px; }
+    .gsync-label { font-size: 10px; color: var(--text-dim); letter-spacing: 0.06em; margin-bottom: 4px; }
+    .gsync-input {
+      width: 100%; background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 5px; color: var(--text); font-family: var(--font);
+      font-size: 11px; padding: 8px 12px; outline: none; transition: border-color 0.15s;
+    }
+    .gsync-input:focus { border-color: rgba(66,133,244,0.5); }
+    .gsync-input::placeholder { color: var(--text-sub); }
+    .gsync-status { font-size: 11px; min-height: 16px; margin-top: 6px; }
+    .gsync-status.ok  { color: var(--green); }
+    .gsync-status.err { color: var(--red); }
+
+    .gsync-connected-box {
+      background: var(--green-dim); border: 1px solid rgba(71,207,115,0.25);
+      border-radius: 8px; padding: 12px 14px; font-size: 11px; color: var(--green);
+      display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;
+    }
+    .gsync-connected-icon { font-size: 18px; }
+    .gsync-connected-text { flex: 1; }
+    .gsync-connected-url  { font-size: 10px; color: rgba(71,207,115,0.7); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ── BACKUP MODAL ── */
+    .backup-section { margin-bottom: 1.1rem; }
+    .backup-section-title { font-size: 10px; color: var(--text-sub); letter-spacing: 0.08em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .backup-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .backup-row { display: flex; gap: 8px; }
+    .backup-btn {
+      flex: 1; font-family: var(--font); font-size: 11px; padding: 10px 12px;
+      border-radius: 6px; cursor: pointer; border: 1px solid var(--border2);
+      transition: all 0.15s; outline: none; display: flex; flex-direction: column;
+      align-items: center; gap: 4px; text-align: center;
+    }
+    .backup-btn:active { transform: scale(0.97); }
+    .backup-btn-icon  { font-size: 18px; }
+    .backup-btn-label { font-size: 11px; font-weight: 500; }
+    .backup-btn-desc  { font-size: 9px; opacity: 0.65; }
+    .backup-btn-export { background: var(--accent-light); border-color: var(--accent-glow); color: var(--accent); }
+    .backup-btn-export:hover { background: rgba(233,30,140,0.18); }
+    .backup-btn-import { background: var(--blue-dim); border-color: rgba(74,158,255,0.3); color: var(--blue); }
+    .backup-btn-import:hover { background: rgba(74,158,255,0.2); }
+    .backup-note { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; font-size: 11px; color: var(--text-dim); line-height: 1.7; }
 
     /* ── PAGES ── */
     .page { display: none; padding: 2.5rem 2rem; max-width: 960px; margin: 0 auto; }
@@ -145,7 +249,6 @@
     .w-amount { width: 120px; }
     .w-note   { width: 180px; }
     .w-date   { width: 150px; }
-
     .entry-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; }
 
     /* ── BUTTONS ── */
@@ -154,9 +257,13 @@
     .btn:active { transform: scale(0.97); }
     .btn-accent { background: var(--accent); border-color: var(--accent); color: #fff; }
     .btn-accent:hover { background: #c7196f; border-color: #c7196f; }
+    .btn-google { background: var(--google-dim); border-color: rgba(66,133,244,0.35); color: var(--google); }
+    .btn-google:hover { background: rgba(66,133,244,0.2); }
     .btn-danger { background: transparent; border-color: rgba(218,51,51,0.4); color: var(--red); }
     .btn-danger:hover { background: var(--red-dim); border-color: var(--red); }
     .btn-sm { padding: 4px 10px; font-size: 10px; }
+    .btn-full { width: 100%; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
     /* ── ADD FORM ── */
     .add-form { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem 1.5rem; margin-bottom: 2rem; }
@@ -169,19 +276,18 @@
     .form-input::placeholder { color: var(--text-sub); }
     .form-actions { display: flex; justify-content: flex-end; }
 
-    /* ── EMPTY ── */
     .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-sub); font-size: 12px; }
     .empty-icon  { font-size: 2rem; opacity: 0.3; margin-bottom: 8px; }
 
-    /* ── TOAST ── */
     .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--card2); border: 1px solid var(--border2); border-radius: 6px; padding: 8px 16px; font-size: 11px; color: var(--text); opacity: 0; transform: translateY(6px); transition: all 0.2s; pointer-events: none; z-index: 999; }
     .toast.show { opacity: 1; transform: translateY(0); }
     .toast.ok   { border-color: rgba(71,207,115,0.35); color: var(--green); }
     .toast.err  { border-color: rgba(218,51,51,0.35); color: var(--red); }
 
-    @media (max-width: 600px) {
+    @media (max-width: 640px) {
       .page           { padding: 1.5rem 1rem; }
       .nav            { padding: 0.8rem 1rem; }
+      #sync-bar       { padding: 4px 1rem; }
       .stats-row      { grid-template-columns: 1fr; }
       .action-buttons { grid-template-columns: 1fr; }
       .form-grid      { grid-template-columns: 1fr 1fr; }
@@ -191,19 +297,159 @@
 </head>
 <body>
 
-<!-- NAV -->
+<!-- ════ GOOGLE SYNC MODAL ════ -->
+<div class="modal-overlay" id="gsync-modal">
+  <div class="modal-box">
+    <div class="modal-title">
+      &#9729; google auto-sync
+      <span class="modal-close" onclick="closeModal('gsync-modal')">&times;</span>
+    </div>
+    <div class="modal-sub" id="gsync-modal-sub">ตั้งค่าครั้งเดียว ซิงค์อัตโนมัติทุกเครื่อง ฟรีถาวร</div>
+
+    <!-- Connected state -->
+    <div id="gsync-connected" style="display:none">
+      <div class="gsync-connected-box">
+        <div class="gsync-connected-icon">&#10003;</div>
+        <div class="gsync-connected-text">
+          เชื่อมต่อ Google สำเร็จ — ซิงค์อัตโนมัติ
+          <div class="gsync-connected-url" id="gsync-url-preview"></div>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-full" style="margin-bottom:8px" onclick="manualSync()">&#8635; sync ทันที</button>
+      <button class="btn btn-sm btn-danger btn-full" onclick="disconnectGoogle()">ตัดการเชื่อมต่อ</button>
+    </div>
+
+    <!-- Setup state -->
+    <div id="gsync-setup">
+      <!-- Step 1 -->
+      <div class="gsync-step">
+        <div class="gsync-step-header">
+          <div class="gsync-num" id="step1-num">1</div>
+          เปิด Google Apps Script
+        </div>
+        <div class="gsync-desc">
+          ไปที่ <a href="https://script.google.com" target="_blank">script.google.com</a>
+          &rarr; กด <strong style="color:var(--text)">+ New project</strong>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="gsync-step">
+        <div class="gsync-step-header">
+          <div class="gsync-num" id="step2-num">2</div>
+          วาง code นี้ลงไป (แทนที่ทุกอย่างเดิม)
+        </div>
+        <div class="gsync-code-block" id="gas-code">function doGet() {
+  var p = PropertiesService.getScriptProperties();
+  var d = p.getProperty('data');
+  return ContentService
+    .createTextOutput(d || '{"borrowed":[],"lent":[]}')
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  var p = PropertiesService.getScriptProperties();
+  p.setProperty('data', e.postData.contents);
+  return ContentService
+    .createTextOutput('{"ok":true}')
+    .setMimeType(ContentService.MimeType.JSON);
+}</div>
+        <span class="gsync-copy-btn" onclick="copyCode()">copy code</span>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="gsync-step">
+        <div class="gsync-step-header">
+          <div class="gsync-num" id="step3-num">3</div>
+          Deploy &rarr; Manage deployments
+        </div>
+        <div class="gsync-desc">
+          กด <strong style="color:var(--text)">Deploy &rarr; New deployment</strong><br>
+          &bull; Type: <strong style="color:var(--text)">Web app</strong><br>
+          &bull; Execute as: <strong style="color:var(--text)">Me</strong><br>
+          &bull; Who has access: <strong style="color:var(--text)">Anyone</strong><br>
+          &bull; กด <strong style="color:var(--text)">Deploy</strong> &rarr; อนุญาต permissions
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="gsync-step">
+        <div class="gsync-step-header">
+          <div class="gsync-num" id="step4-num">4</div>
+          copy Web App URL มาวางด้านล่าง
+        </div>
+        <div class="gsync-desc">URL จะขึ้นต้นด้วย <span style="color:var(--green)">https://script.google.com/macros/s/...</span></div>
+      </div>
+
+      <div class="gsync-divider"></div>
+
+      <div class="gsync-field">
+        <div class="gsync-label">web app url</div>
+        <input class="gsync-input" id="gsync-url-input" type="text" placeholder="https://script.google.com/macros/s/...">
+      </div>
+      <div class="gsync-status" id="gsync-status"></div>
+      <button class="btn btn-google btn-full" id="gsync-connect-btn" onclick="connectGoogle()" style="margin-top:10px">
+        เชื่อมต่อ Google
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ BACKUP MODAL ════ -->
+<div class="modal-overlay" id="backup-modal">
+  <div class="modal-box">
+    <div class="modal-title">
+      &#128190; backup &amp; restore
+      <span class="modal-close" onclick="closeModal('backup-modal')">&times;</span>
+    </div>
+    <div class="modal-sub">สำรองข้อมูลเป็นไฟล์ เก็บไว้ใน Google Drive หรือ iCloud</div>
+
+    <div class="backup-section">
+      <div class="backup-section-title">ดาวน์โหลด / อัปโหลด</div>
+      <div class="backup-row">
+        <button class="backup-btn backup-btn-export" onclick="exportData()">
+          <span class="backup-btn-icon">&#8595;</span>
+          <span class="backup-btn-label">Export</span>
+          <span class="backup-btn-desc">ดาวน์โหลดเป็น .json</span>
+        </button>
+        <button class="backup-btn backup-btn-import" onclick="document.getElementById('import-file').click()">
+          <span class="backup-btn-icon">&#8593;</span>
+          <span class="backup-btn-label">Import</span>
+          <span class="backup-btn-desc">โหลดจากไฟล์ .json</span>
+        </button>
+      </div>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+
+    <div class="backup-note">
+      <strong style="color:var(--text)">วิธีย้ายเครื่อง:</strong><br>
+      1. กด Export &rarr; บันทึกไฟล์ไว้ใน Google Drive<br>
+      2. เปิดแอปบนเครื่องใหม่ &rarr; กด Import &rarr; เลือกไฟล์ &rarr; เสร็จ
+    </div>
+  </div>
+</div>
+
+<!-- ════ SYNC BAR ════ -->
+<div id="sync-bar">
+  <div class="sync-dot" id="sync-dot"></div>
+  <span id="sync-msg">local only &mdash; กด &#9729; เพื่อเชื่อมต่อ Google</span>
+</div>
+
+<!-- ════ NAV ════ -->
 <nav class="nav">
   <div class="nav-logo" onclick="showPage('dashboard')">borrow<span>.log</span></div>
-  <div class="nav-links">
+  <div class="nav-right">
     <div class="nav-link active" id="nav-dashboard" onclick="showPage('dashboard')">dashboard</div>
     <div class="nav-link" id="nav-borrowed"  onclick="showPage('borrowed')">i borrowed</div>
     <div class="nav-link" id="nav-lent"      onclick="showPage('lent')">they borrowed</div>
+    <button class="nav-icon-btn" id="gsync-nav-btn" onclick="openGsync()" title="google sync">&#9729;</button>
+    <button class="nav-icon-btn" onclick="openModal('backup-modal')" title="backup">&#128190;</button>
   </div>
 </nav>
 
 <div class="toast" id="toast"></div>
 
-<!-- DASHBOARD -->
+<!-- ════ DASHBOARD ════ -->
 <div class="page active" id="page-dashboard">
   <div class="page-header">
     <div class="page-title">borrow<span class="hl">.log</span></div>
@@ -223,7 +469,7 @@
       </div>
     </div>
     <div class="chart-wrap">
-      <canvas id="overviewChart" role="img" aria-label="Balance overview chart.">Balance overview.</canvas>
+      <canvas id="overviewChart" role="img" aria-label="Balance overview.">Balance overview.</canvas>
     </div>
   </div>
   <div class="action-buttons">
@@ -246,7 +492,7 @@
   <div id="dash-pending"></div>
 </div>
 
-<!-- I BORROWED -->
+<!-- ════ I BORROWED ════ -->
 <div class="page" id="page-borrowed">
   <div class="page-header">
     <div class="page-title"><span class="hl">i</span> borrowed</div>
@@ -267,7 +513,7 @@
   <div class="entries-list" id="b-list"></div>
 </div>
 
-<!-- THEY BORROWED -->
+<!-- ════ THEY BORROWED ════ -->
 <div class="page" id="page-lent">
   <div class="page-header">
     <div class="page-title"><span class="hl">they</span> borrowed</div>
@@ -289,24 +535,32 @@
 </div>
 
 <script>
-var STORAGE_KEY = 'borrowlog-v1';
-var db = { borrowed: [], lent: [] };
-var chartInst = null;
+/* ════════════════════════════════════
+   STATE
+════════════════════════════════════ */
+var STORAGE_KEY   = 'borrowlog-v1';
+var SCRIPT_URL_KEY = 'borrowlog-script-url';
+var db         = { borrowed: [], lent: [] };
+var scriptUrl  = '';
+var chartInst  = null;
 var toastTimer = null;
+var saveTimer  = null;
 
-/* ── utils ── */
+/* ════════════════════════════════════
+   UTILS
+════════════════════════════════════ */
 function todayStr() { return new Date().toISOString().split('T')[0]; }
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function fmt(n) {
   n = Number(n) || 0;
   return '\u0E3F' + n.toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
 function fmtDate(d) {
   if (!d) return '';
-  return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' });
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'2-digit' });
 }
 function escH(s) {
-  return String(s || '').split('&').join('&amp;').split('\u003C').join('&lt;').split('\u003E').join('&gt;').split('"').join('&quot;');
+  return String(s||'').split('&').join('&amp;').split('\u003C').join('&lt;').split('\u003E').join('&gt;').split('"').join('&quot;');
 }
 function getRem(e) {
   var p = 0;
@@ -325,29 +579,234 @@ function getPct(e) {
   return Math.min(100, Math.round(((a - getRem(e)) / a) * 100));
 }
 
-/* ── storage ── */
-function loadData() {
-  try { var s = localStorage.getItem(STORAGE_KEY); if (s) db = JSON.parse(s); } catch (ex) {}
+/* ════════════════════════════════════
+   STORAGE
+════════════════════════════════════ */
+function loadLocal() {
+  try { var s = localStorage.getItem(STORAGE_KEY); if (s) db = JSON.parse(s); } catch(ex) {}
 }
-function saveData() {
+function saveLocal() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
 }
 
-/* ── toast ── */
+/* ════════════════════════════════════
+   TOAST
+════════════════════════════════════ */
 function showToast(msg, type) {
   var el = document.getElementById('toast');
   el.textContent = msg;
-  el.className = 'toast show' + (type ? ' ' + type : '');
+  el.className = 'toast show' + (type ? ' '+type : '');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(function() { el.className = 'toast'; }, 2200);
+  toastTimer = setTimeout(function() { el.className = 'toast'; }, 2500);
 }
 
-/* ── navigation ── */
+/* ════════════════════════════════════
+   SYNC BAR
+════════════════════════════════════ */
+function setSyncStatus(state, msg) {
+  var dot = document.getElementById('sync-dot');
+  var txt = document.getElementById('sync-msg');
+  dot.className = 'sync-dot ' + (state || '');
+  txt.textContent = msg;
+}
+
+/* ════════════════════════════════════
+   GOOGLE APPS SCRIPT SYNC
+════════════════════════════════════ */
+function googleLoad() {
+  if (!scriptUrl) return Promise.resolve(false);
+  setSyncStatus('syncing', 'กำลังโหลดจาก Google...');
+  return fetch(scriptUrl, { cache: 'no-store' })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      if (data && typeof data.borrowed !== 'undefined') {
+        db = data;
+        saveLocal();
+        setSyncStatus('ok', 'Google sync \u2022 ' + new Date().toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' }));
+        return true;
+      }
+      return false;
+    })
+    .catch(function() {
+      setSyncStatus('err', 'โหลดจาก Google ไม่ได้ \u2014 ใช้ข้อมูลในเครื่องแทน');
+      return false;
+    });
+}
+
+function googleSave() {
+  if (!scriptUrl) return;
+  setSyncStatus('syncing', 'กำลัง save ไปยัง Google...');
+  fetch(scriptUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(db)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function() {
+    setSyncStatus('ok', 'Google sync \u2022 ' + new Date().toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' }));
+  })
+  .catch(function() {
+    setSyncStatus('err', 'sync ไม่สำเร็จ \u2014 ตรวจสอบ URL หรืออินเตอร์เน็ต');
+  });
+}
+
+function scheduleSave() {
+  saveLocal();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(googleSave, 1500);
+}
+
+function manualSync() {
+  closeModal('gsync-modal');
+  googleLoad().then(function() { renderAll(); showToast('synced!', 'ok'); });
+}
+
+/* ════════════════════════════════════
+   GOOGLE SYNC MODAL
+════════════════════════════════════ */
+function updateGsyncNavBtn() {
+  var btn = document.getElementById('gsync-nav-btn');
+  if (scriptUrl) {
+    btn.classList.add('connected');
+    btn.title = 'google sync \u2014 connected';
+  } else {
+    btn.classList.remove('connected');
+    btn.title = 'setup google sync';
+  }
+}
+
+function openGsync() {
+  var connected = document.getElementById('gsync-connected');
+  var setup     = document.getElementById('gsync-setup');
+  if (scriptUrl) {
+    connected.style.display = 'block';
+    setup.style.display     = 'none';
+    document.getElementById('gsync-url-preview').textContent = scriptUrl.slice(0, 60) + '...';
+    document.getElementById('modal-sub') && (document.getElementById('gsync-modal-sub').textContent = 'เชื่อมต่อ Google สำเร็จ');
+  } else {
+    connected.style.display = 'none';
+    setup.style.display     = 'block';
+  }
+  openModal('gsync-modal');
+}
+
+function connectGoogle() {
+  var url = document.getElementById('gsync-url-input').value.trim();
+  var statusEl = document.getElementById('gsync-status');
+  var btn      = document.getElementById('gsync-connect-btn');
+
+  if (!url || url.indexOf('script.google.com') === -1) {
+    statusEl.className = 'gsync-status err';
+    statusEl.textContent = 'URL ไม่ถูกต้อง ต้องขึ้นต้นด้วย https://script.google.com/macros/s/...';
+    return;
+  }
+
+  statusEl.className = 'gsync-status';
+  statusEl.textContent = 'กำลังทดสอบการเชื่อมต่อ...';
+  btn.disabled = true;
+  btn.textContent = 'กำลังเชื่อมต่อ...';
+
+  fetch(url, { cache: 'no-store' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (typeof data.borrowed !== 'undefined' || data.ok === true || Array.isArray(data.borrowed)) {
+        scriptUrl = url;
+        localStorage.setItem(SCRIPT_URL_KEY, url);
+
+        /* push current local data to cloud (first-time setup) */
+        return fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(db)
+        });
+      } else {
+        throw new Error('response ไม่ถูกต้อง');
+      }
+    })
+    .then(function() {
+      statusEl.className   = 'gsync-status ok';
+      statusEl.textContent = '\u2713 เชื่อมต่อสำเร็จ!';
+      updateGsyncNavBtn();
+      setSyncStatus('ok', 'Google sync เชื่อมต่อแล้ว');
+      setTimeout(function() { openGsync(); btn.disabled = false; btn.textContent = 'เชื่อมต่อ Google'; }, 800);
+    })
+    .catch(function(err) {
+      statusEl.className   = 'gsync-status err';
+      statusEl.textContent = 'เชื่อมต่อไม่ได้: ตรวจสอบว่า Deploy เป็น Anyone แล้ว';
+      btn.disabled = false;
+      btn.textContent = 'เชื่อมต่อ Google';
+    });
+}
+
+function disconnectGoogle() {
+  if (!confirm('ตัดการเชื่อมต่อ Google? ข้อมูลในเครื่องยังอยู่')) return;
+  scriptUrl = '';
+  localStorage.removeItem(SCRIPT_URL_KEY);
+  updateGsyncNavBtn();
+  setSyncStatus('', 'local only \u2014 กด \u2601 เพื่อเชื่อมต่อ Google');
+  closeModal('gsync-modal');
+  showToast('ตัดการเชื่อมต่อแล้ว');
+}
+
+function copyCode() {
+  var code = document.getElementById('gas-code').textContent;
+  navigator.clipboard.writeText(code).then(function() { showToast('copied code!', 'ok'); });
+}
+
+/* ════════════════════════════════════
+   BACKUP MODAL
+════════════════════════════════════ */
+function exportData() {
+  var now   = new Date();
+  var stamp = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+  var blob  = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  var url   = URL.createObjectURL(blob);
+  var a     = document.createElement('a');
+  a.href = url; a.download = 'borrowlog-backup-' + stamp + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('exported!', 'ok');
+}
+
+function importData(ev) {
+  var file = ev.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var parsed = JSON.parse(e.target.result);
+      if (!parsed.borrowed || !parsed.lent) { showToast('ไฟล์ไม่ถูกต้อง', 'err'); return; }
+      if (!confirm('Import จะแทนที่ข้อมูลปัจจุบัน ยืนยัน?')) return;
+      db = parsed;
+      saveLocal();
+      if (scriptUrl) googleSave();
+      renderAll();
+      closeModal('backup-modal');
+      showToast('import สำเร็จ!', 'ok');
+    } catch(ex) { showToast('อ่านไฟล์ไม่ได้', 'err'); }
+    ev.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+/* ════════════════════════════════════
+   MODAL HELPERS
+════════════════════════════════════ */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(function(el) {
+  el.addEventListener('click', function(ev) { if (ev.target === el) el.classList.remove('open'); });
+});
+
+/* ════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════ */
 function showPage(id) {
-  var pages = document.querySelectorAll('.page');
-  for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
-  var links = document.querySelectorAll('.nav-link');
-  for (var i = 0; i < links.length; i++) links[i].classList.remove('active');
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.nav-link').forEach(function(n) { n.classList.remove('active'); });
   document.getElementById('page-' + id).classList.add('active');
   document.getElementById('nav-' + id).classList.add('active');
   renderAll();
@@ -355,7 +814,9 @@ function showPage(id) {
 function toggleDetail(id) { var el = document.getElementById('det-' + id); if (el) el.classList.toggle('open'); }
 function keepOpen(id)      { var el = document.getElementById('det-' + id); if (el) el.classList.add('open'); }
 
-/* ── chart ── */
+/* ════════════════════════════════════
+   CHART
+════════════════════════════════════ */
 function renderChart(bRet, bPend, lRet, lPend) {
   var canvas = document.getElementById('overviewChart');
   if (!canvas) return;
@@ -365,15 +826,15 @@ function renderChart(bRet, bPend, lRet, lPend) {
     data: {
       labels: ['i borrowed', 'they borrowed'],
       datasets: [
-        { label: 'returned / paid', data: [Math.round(bRet),  Math.round(lRet)],  backgroundColor: 'rgba(71,207,115,0.45)',  borderColor: '#47cf73', borderWidth: 1, borderRadius: 4 },
-        { label: 'still pending',   data: [Math.round(bPend), Math.round(lPend)], backgroundColor: 'rgba(233,30,140,0.35)',  borderColor: '#e91e8c', borderWidth: 1, borderRadius: 4 }
+        { label: 'returned / paid', data: [Math.round(bRet),  Math.round(lRet)],  backgroundColor: 'rgba(71,207,115,0.45)', borderColor: '#47cf73', borderWidth: 1, borderRadius: 4 },
+        { label: 'still pending',   data: [Math.round(bPend), Math.round(lPend)], backgroundColor: 'rgba(233,30,140,0.35)', borderColor: '#e91e8c', borderWidth: 1, borderRadius: 4 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: { callbacks: { label: function(item) { return ' ' + item.dataset.label + ': \u0E3F' + item.parsed.y.toLocaleString(); } } }
+        tooltip: { callbacks: { label: function(it) { return ' ' + it.dataset.label + ': \u0E3F' + it.parsed.y.toLocaleString(); } } }
       },
       scales: {
         x: { stacked: true, grid: { display: false }, ticks: { color: '#646478', font: { family: "'JetBrains Mono', monospace", size: 11 } } },
@@ -383,79 +844,72 @@ function renderChart(bRet, bPend, lRet, lPend) {
   });
 }
 
-/* ── dashboard ── */
+/* ════════════════════════════════════
+   RENDER DASHBOARD
+════════════════════════════════════ */
 function renderDashboard() {
   var i, e, bRem = 0, lRem = 0, bTot = 0, lTot = 0;
   for (i = 0; i < db.borrowed.length; i++) { e = db.borrowed[i]; bRem += getRem(e); bTot += Number(e.amount); }
   for (i = 0; i < db.lent.length; i++)     { e = db.lent[i];     lRem += getRem(e); lTot += Number(e.amount); }
   var net = lRem - bRem;
-
   document.getElementById('dash-owe').textContent  = fmt(bRem);
   document.getElementById('dash-lent').textContent = fmt(lRem);
-
   var nc = net >= 0 ? 'c-green' : 'c-red';
   var sc = net >= 0 ? 's-green' : 's-red';
   document.getElementById('dash-stats').innerHTML =
-    '<div class="stat-card s-red"><div class="stat-label">i owe (remaining)</div><div class="stat-value c-red">'   + fmt(bRem) + '</div><div class="stat-sub">of ' + fmt(bTot) + ' total borrowed</div></div>' +
+    '<div class="stat-card s-red"><div class="stat-label">i owe (remaining)</div><div class="stat-value c-red">'      + fmt(bRem) + '</div><div class="stat-sub">of ' + fmt(bTot) + ' total borrowed</div></div>' +
     '<div class="stat-card s-green"><div class="stat-label">owed to me (remaining)</div><div class="stat-value c-green">' + fmt(lRem) + '</div><div class="stat-sub">of ' + fmt(lTot) + ' total lent</div></div>' +
     '<div class="stat-card ' + sc + '"><div class="stat-label">net balance</div><div class="stat-value ' + nc + '">' + (net >= 0 ? '+' : '') + fmt(net) + '</div><div class="stat-sub">' + (net >= 0 ? 'in your favor' : 'you owe more') + '</div></div>';
-
   renderChart(bTot - bRem, bRem, lTot - lRem, lRem);
 
   var allPending = [];
   for (i = 0; i < db.borrowed.length; i++) { e = db.borrowed[i]; if (getRem(e) > 0) allPending.push({ e: e, t: 'borrowed' }); }
   for (i = 0; i < db.lent.length; i++)     { e = db.lent[i];     if (getRem(e) > 0) allPending.push({ e: e, t: 'lent' }); }
-  allPending.sort(function(a, b) { return new Date(b.e.date) - new Date(a.e.date); });
-
+  allPending.sort(function(a,b) { return new Date(b.e.date) - new Date(a.e.date); });
   var el = document.getElementById('dash-pending');
-  if (!allPending.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">\u2713</div>all settled up!</div>';
-    return;
-  }
+  if (!allPending.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">\u2713</div>all settled up!</div>'; return; }
   var html = '<div class="entries-list">';
   for (i = 0; i < Math.min(allPending.length, 10); i++) {
     var item = allPending[i]; e = item.e;
     var rem = getRem(e); var p = getPct(e); var st = getStatus(e);
-    var ac  = item.t === 'borrowed' ? 'var(--red)' : 'var(--green)';
+    var ac = item.t === 'borrowed' ? 'var(--red)' : 'var(--green)';
     var tag = item.t === 'borrowed' ? '\u2190 i owe' : '\u2192 owes me';
     html += '<div class="entry-card"><div class="entry-main" style="cursor:default">' +
       '<div><div class="entry-person">' + escH(e.person) + ' <span style="font-size:9px;color:var(--text-sub);font-weight:400">' + tag + '</span></div>' +
-      '<div class="entry-desc">' + escH(e.description || '\u2014') + '</div>' +
+      '<div class="entry-desc">' + escH(e.description||'\u2014') + '</div>' +
       '<div class="entry-date">' + fmtDate(e.date) + '</div>' +
-      '<div class="progress-bar"><div class="progress-fill' + (p >= 100 ? ' done' : '') + '" style="width:' + p + '%"></div></div></div>' +
+      '<div class="progress-bar"><div class="progress-fill' + (p>=100?' done':'') + '" style="width:' + p + '%"></div></div></div>' +
       '<div class="entry-right"><div class="entry-amount" style="color:' + ac + '">' + fmt(rem) + '</div>' +
-      '<div class="entry-remaining">remaining</div>' +
-      '<span class="entry-badge badge-' + st + '">' + st + '</span></div>' +
+      '<div class="entry-remaining">remaining</div><span class="entry-badge badge-' + st + '">' + st + '</span></div>' +
       '</div></div>';
   }
   el.innerHTML = html + '</div>';
 }
 
-/* ── entries ── */
+/* ════════════════════════════════════
+   RENDER ENTRIES
+════════════════════════════════════ */
 function renderEntries(type) {
   var i, e;
   var list = db[type]; var pfx = type === 'borrowed' ? 'b' : 'l'; var isBorrow = type === 'borrowed';
   var total = 0, rem = 0, pending = 0;
   for (i = 0; i < list.length; i++) { total += Number(list[i].amount); rem += getRem(list[i]); if (getRem(list[i]) > 0) pending++; }
   var returned = total - rem;
-
   var statsEl = document.getElementById(pfx + '-stats');
   if (isBorrow) {
     statsEl.innerHTML =
-      '<div class="stat-card s-dim"><div class="stat-label">total borrowed</div><div class="stat-value">'     + fmt(total)    + '</div><div class="stat-sub">' + list.length + ' entries</div></div>' +
-      '<div class="stat-card s-red"><div class="stat-label">still owe</div><div class="stat-value c-red">'     + fmt(rem)      + '</div><div class="stat-sub">' + pending + ' pending</div></div>' +
-      '<div class="stat-card s-green"><div class="stat-label">returned</div><div class="stat-value c-green">'  + fmt(returned) + '</div><div class="stat-sub">' + (list.length - pending) + ' fully settled</div></div>';
+      '<div class="stat-card s-dim"><div class="stat-label">total borrowed</div><div class="stat-value">'      + fmt(total)    + '</div><div class="stat-sub">' + list.length + ' entries</div></div>' +
+      '<div class="stat-card s-red"><div class="stat-label">still owe</div><div class="stat-value c-red">'      + fmt(rem)      + '</div><div class="stat-sub">' + pending + ' pending</div></div>' +
+      '<div class="stat-card s-green"><div class="stat-label">returned</div><div class="stat-value c-green">'   + fmt(returned) + '</div><div class="stat-sub">' + (list.length-pending) + ' fully settled</div></div>';
   } else {
     statsEl.innerHTML =
-      '<div class="stat-card s-dim"><div class="stat-label">total lent</div><div class="stat-value">'           + fmt(total)    + '</div><div class="stat-sub">' + list.length + ' entries</div></div>' +
-      '<div class="stat-card s-green"><div class="stat-label">owed to me</div><div class="stat-value c-green">'  + fmt(rem)      + '</div><div class="stat-sub">' + pending + ' pending</div></div>' +
-      '<div class="stat-card s-accent"><div class="stat-label">received back</div><div class="stat-value c-accent">' + fmt(returned) + '</div><div class="stat-sub">' + (list.length - pending) + ' fully returned</div></div>';
+      '<div class="stat-card s-dim"><div class="stat-label">total lent</div><div class="stat-value">'            + fmt(total)    + '</div><div class="stat-sub">' + list.length + ' entries</div></div>' +
+      '<div class="stat-card s-green"><div class="stat-label">owed to me</div><div class="stat-value c-green">'   + fmt(rem)      + '</div><div class="stat-sub">' + pending + ' pending</div></div>' +
+      '<div class="stat-card s-accent"><div class="stat-label">received back</div><div class="stat-value c-accent">' + fmt(returned) + '</div><div class="stat-sub">' + (list.length-pending) + ' fully returned</div></div>';
   }
-
   var listEl = document.getElementById(pfx + '-list');
   if (!list.length) { listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83D\uDCCB</div>no entries yet \u2014 add one above</div>'; return; }
-
-  var sorted = list.slice().sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+  var sorted = list.slice().sort(function(a,b) { return new Date(b.date) - new Date(a.date); });
   var html = '';
   for (i = 0; i < sorted.length; i++) html += buildEntryHtml(sorted[i], type, isBorrow);
   listEl.innerHTML = html;
@@ -465,7 +919,6 @@ function buildEntryHtml(e, type, isBorrow) {
   var rem = getRem(e); var st = getStatus(e); var p = getPct(e); var isPaid = st === 'paid';
   var ac = isBorrow ? 'var(--red)' : 'var(--green)';
   var j, r, rHtml = '';
-
   if (e.returns.length === 0) {
     rHtml = '<div class="no-returns">no payments recorded yet</div>';
   } else {
@@ -477,7 +930,6 @@ function buildEntryHtml(e, type, isBorrow) {
         '<span class="return-del" onclick="delReturn(\'' + type + '\',\'' + e.id + '\',\'' + r.id + '\')">remove</span></div></div>';
     }
   }
-
   var addHtml = '';
   if (!isPaid) {
     addHtml = '<div class="add-return-wrap"><div class="detail-label" style="margin-top:10px">record a payment</div>' +
@@ -488,15 +940,14 @@ function buildEntryHtml(e, type, isBorrow) {
       '<button class="btn btn-accent btn-sm" onclick="addReturn(\'' + type + '\',\'' + e.id + '\')" style="align-self:flex-end">record</button>' +
       '</div></div>';
   }
-
   return '<div class="entry-card" id="card-' + e.id + '">' +
     '<div class="entry-main" onclick="toggleDetail(\'' + e.id + '\')">' +
       '<div><div class="entry-person">' + escH(e.person) + '</div>' +
-      '<div class="entry-desc">' + escH(e.description || '\u2014') + '</div>' +
+      '<div class="entry-desc">' + escH(e.description||'\u2014') + '</div>' +
       '<div class="entry-date">' + fmtDate(e.date) + '</div>' +
-      '<div class="progress-bar"><div class="progress-fill' + (p >= 100 ? ' done' : '') + '" style="width:' + p + '%"></div></div></div>' +
+      '<div class="progress-bar"><div class="progress-fill' + (p>=100?' done':'') + '" style="width:' + p + '%"></div></div></div>' +
       '<div class="entry-right"><div class="entry-amount" style="color:' + ac + '">' + fmt(e.amount) + '</div>' +
-      '<div class="entry-remaining' + (isPaid ? ' settled' : '') + '">' + (isPaid ? '\u2713 fully settled' : fmt(rem) + ' remaining') + '</div>' +
+      '<div class="entry-remaining' + (isPaid?' settled':'') + '">' + (isPaid ? '\u2713 fully settled' : fmt(rem)+' remaining') + '</div>' +
       '<span class="entry-badge badge-' + st + '">' + st + '</span></div>' +
     '</div>' +
     '<div class="entry-details" id="det-' + e.id + '">' +
@@ -505,61 +956,72 @@ function buildEntryHtml(e, type, isBorrow) {
     '</div></div>';
 }
 
-/* ── CRUD ── */
+/* ════════════════════════════════════
+   CRUD
+════════════════════════════════════ */
 function addEntry(type) {
-  var pfx    = type === 'borrowed' ? 'b' : 'l';
-  var person = document.getElementById(pfx + '-person').value.trim();
-  var desc   = document.getElementById(pfx + '-desc').value.trim();
-  var amount = parseFloat(document.getElementById(pfx + '-amount').value);
-  var date   = document.getElementById(pfx + '-date').value;
-  if (!person)                { showToast('please enter a name', 'err'); return; }
+  var pfx = type === 'borrowed' ? 'b' : 'l';
+  var person = document.getElementById(pfx+'-person').value.trim();
+  var desc   = document.getElementById(pfx+'-desc').value.trim();
+  var amount = parseFloat(document.getElementById(pfx+'-amount').value);
+  var date   = document.getElementById(pfx+'-date').value;
+  if (!person)               { showToast('please enter a name', 'err'); return; }
   if (!amount || amount <= 0) { showToast('please enter a valid amount', 'err'); return; }
-  db[type].unshift({ id: uid(), person: person, description: desc, amount: amount, date: date || todayStr(), returns: [] });
-  saveData();
-  document.getElementById(pfx + '-person').value = '';
-  document.getElementById(pfx + '-desc').value   = '';
-  document.getElementById(pfx + '-amount').value = '';
-  document.getElementById(pfx + '-date').value   = todayStr();
+  db[type].unshift({ id: uid(), person: person, description: desc, amount: amount, date: date||todayStr(), returns: [] });
+  scheduleSave();
+  document.getElementById(pfx+'-person').value = '';
+  document.getElementById(pfx+'-desc').value   = '';
+  document.getElementById(pfx+'-amount').value = '';
+  document.getElementById(pfx+'-date').value   = todayStr();
   renderEntries(type);
   showToast('entry added', 'ok');
 }
-
 function delEntry(type, id) {
   if (!confirm('delete this entry?')) return;
   var list = db[type];
-  for (var i = 0; i < list.length; i++) { if (list[i].id === id) { list.splice(i, 1); break; } }
-  saveData(); renderEntries(type); showToast('deleted');
+  for (var i = 0; i < list.length; i++) { if (list[i].id === id) { list.splice(i,1); break; } }
+  scheduleSave(); renderEntries(type); showToast('deleted');
 }
-
 function addReturn(type, entryId) {
-  var amtEl  = document.getElementById('ra-' + entryId);
-  var noteEl = document.getElementById('rn-' + entryId);
-  var dateEl = document.getElementById('rd-' + entryId);
+  var amtEl  = document.getElementById('ra-'+entryId);
+  var noteEl = document.getElementById('rn-'+entryId);
+  var dateEl = document.getElementById('rd-'+entryId);
   var amount = parseFloat(amtEl ? amtEl.value : '');
   if (!amount || amount <= 0) { showToast('enter a valid amount', 'err'); return; }
   var e = null;
   for (var i = 0; i < db[type].length; i++) { if (db[type][i].id === entryId) { e = db[type][i]; break; } }
   if (!e) return;
-  if (amount > getRem(e) + 0.01) { showToast('exceeds remaining ' + fmt(getRem(e)), 'err'); return; }
-  e.returns.push({ id: uid(), amount: amount, note: noteEl ? noteEl.value.trim() : '', date: dateEl && dateEl.value ? dateEl.value : todayStr() });
-  saveData(); renderEntries(type); keepOpen(entryId); showToast('payment recorded', 'ok');
+  if (amount > getRem(e)+0.01) { showToast('exceeds remaining '+fmt(getRem(e)), 'err'); return; }
+  e.returns.push({ id: uid(), amount: amount, note: noteEl?noteEl.value.trim():'', date: dateEl&&dateEl.value?dateEl.value:todayStr() });
+  scheduleSave(); renderEntries(type); keepOpen(entryId); showToast('payment recorded', 'ok');
 }
-
 function delReturn(type, entryId, returnId) {
   var e = null;
   for (var i = 0; i < db[type].length; i++) { if (db[type][i].id === entryId) { e = db[type][i]; break; } }
   if (!e) return;
-  for (var j = 0; j < e.returns.length; j++) { if (e.returns[j].id === returnId) { e.returns.splice(j, 1); break; } }
-  saveData(); renderEntries(type); keepOpen(entryId); showToast('payment removed');
+  for (var j = 0; j < e.returns.length; j++) { if (e.returns[j].id === returnId) { e.returns.splice(j,1); break; } }
+  scheduleSave(); renderEntries(type); keepOpen(entryId); showToast('payment removed');
 }
 
 function renderAll() { renderDashboard(); renderEntries('borrowed'); renderEntries('lent'); }
 
-/* ── init ── */
-loadData();
+/* ════════════════════════════════════
+   INIT
+════════════════════════════════════ */
+loadLocal();
+scriptUrl = localStorage.getItem(SCRIPT_URL_KEY) || '';
+updateGsyncNavBtn();
+
 document.getElementById('b-date').value = todayStr();
 document.getElementById('l-date').value = todayStr();
-renderAll();
+
+if (scriptUrl) {
+  setSyncStatus('syncing', 'กำลังโหลดจาก Google...');
+  googleLoad().then(function() { renderAll(); });
+} else {
+  setSyncStatus('', 'local only \u2014 กด \u2601 เพื่อเชื่อมต่อ Google');
+  renderAll();
+}
 </script>
 </body>
 </html>
